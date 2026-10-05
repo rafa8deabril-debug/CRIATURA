@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="atardecer">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#2a0f3d">
+  <title>Feliz cumpleaños ♡</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,600;1,9..144,700&family=Dancing+Script:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styli.css">
+</head>
+<body class="locked">
+
+  <!-- Dibujos reutilizables: globo redondo y globo de corazón -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="balloon" viewBox="0 0 100 180">
+        <path d="M50 130 C42 142 58 152 50 162 C44 170 54 175 50 180" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.6"/>
+        <path d="M50 114 L42 130 L58 130 Z" fill="currentColor"/>
+        <path d="M50 4 C20 4 6 30 6 56 C6 88 30 112 50 116 C70 112 94 88 94 56 C94 30 80 4 50 4 Z" fill="currentColor"/>
+        <ellipse cx="30" cy="36" rx="8" ry="15" transform="rotate(-24 30 36)" fill="#fff" opacity=".55"/>
+      </symbol>
+      <symbol id="hballoon" viewBox="0 0 100 180">
+        <path d="M50 128 C42 140 58 150 50 160 C44 168 54 174 50 180" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.6"/>
+        <path d="M50 108 L41 126 L59 126 Z" fill="currentColor"/>
+        <path d="M50 114 C8 80 2 54 2 36 C2 16 18 4 34 4 C42 4 48 10 50 14 C52 10 58 4 66 4 C82 4 98 16 98 36 C98 54 92 80 50 114 Z" fill="currentColor"/>
+        <ellipse cx="27" cy="30" rx="7" ry="12" transform="rotate(-32 27 30)" fill="#fff" opacity=".55"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <div class="floaters" id="floaters" aria-hidden="true"></div>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <button id="themeBtn" class="theme-btn" type="button" aria-label="Cambiar paleta de colores">🎨</button>
+  <span id="themeName" class="theme-name" aria-live="polite"></span>
+
+  <!-- ============ INTRO: GLOBOS + FUEGOS ARTIFICIALES ============ -->
+  <section id="intro" aria-label="Pantalla de inicio">
+    <canvas id="fw" aria-hidden="true"></canvas>
+
+    <div class="bouquet">
+      <button class="b" type="button" style="--a:-46deg;--s:.86;--c:var(--b4)" aria-label="Globo"><svg viewBox="0 0 100 180"><use href="#balloon"/></svg></button>
+      <button class="b" type="button" style="--a:-31deg;--s:1;--c:var(--b1)" aria-label="Globo"><svg viewBox="0 0 100 180"><use href="#hballoon"/></svg></button>
+      <button class="b" type="button" style="--a:-15deg;--s:.92;--c:var(--b2)" aria-label="Globo"><svg viewBox="0 0 100 180"><use href="#balloon"/></svg></button>
+      <button class="b" type="button" style="--a:0deg;--s:1.12;--c:var(--b6)" aria-label="Globo"><svg viewBox="0 0 100 180"><use href="#hballoon"/></svg></button>
+      <button class="b" type="button" style="--a:15deg;--s:.94;--c:var(--b5)" aria-label="Globo"><svg viewBox="0 0 100 180"><use href="#balloon"/></svg></button>
+      <button class="b" type="button" style="--a:31deg;--s:1;--c:var(--b3)" aria-label="Globo"><svg viewBox="0 0 100 180"><use href="#hballoon"/></svg></button>
+      <button class="b" type="button" style="--a:46deg;--s:.86;--c:var(--b7)" aria-label="Globo"><svg viewBox="0 0 100 180"><use href="#balloon"/></svg></button>
+    </div>
+
+    <p class="intro-text">hay algo para ti<small>solo uno de estos globos guarda la sorpresa</small></p>
+    <p class="intro-toast" id="toast" aria-live="polite"></p>
+
+    <div class="greet" aria-live="polite">
+      <span class="g1">Feliz cumpleaños</span>
+      <span class="g2" id="dedic">mi amor</span>
+      <span class="g3" aria-hidden="true">♥ ♥ ♥</span>
+    </div>
+    <button class="btn go-btn" id="goBtn" type="button">Continuar ♥</button>
+  </section>
+
+  <!-- ============ CUENTA REGRESIVA (se abre a la medianoche) ============ -->
+  <section id="lock" class="lock" hidden aria-label="Cuenta regresiva">
+    <span class="lock-heart" aria-hidden="true">♥</span>
+    <p class="lock-kicker">tu sorpresa se abre a la medianoche</p>
+    <h2 class="lock-title" id="lockDate">5 de octubre</h2>
+    <div class="lock-count" aria-live="off">
+      <div id="lkD"><b>0</b><small>días</small></div>
+      <div><b id="lkH">00</b><small>horas</small></div>
+      <div><b id="lkM">00</b><small>min</small></div>
+      <div><b id="lkS">00</b><small>seg</small></div>
+    </div>
+    <p class="lock-note">ya casi, mi amor ♥</p>
+  </section>
+
+  <button id="musicBtn" class="music-btn" aria-label="Pausar o reproducir música" type="button">♪</button>
+  <audio id="audio" src="musica.mp3" loop preload="auto"></audio>
+
+  <main id="main">
+
+    <!-- ============ PORTADA ============ -->
+    <header class="hero" id="inicio">
+      <svg class="hero-heart" viewBox="0 0 100 92" aria-hidden="true"><path d="M50 90 C8 58 2 36 2 24 C2 10 14 2 26 2 C36 2 46 8 50 16 C54 8 64 2 74 2 C86 2 98 10 98 24 C98 36 92 58 50 90 Z"/></svg>
+      <div class="balloons" id="balloons" aria-hidden="true"></div>
+      <div class="bunting hin" id="bunting" style="--i:0" aria-hidden="true"></div>
+      <p class="hero-kicker hin" style="--i:1">hoy es tu día</p>
+      <h1 class="hero-title hin" style="--i:2">
+        <span class="script">Feliz cumpleaños</span>
+        <span class="name" id="nombre">Amy</span>
+      </h1>
+      <div class="age hin" id="ageBox" style="--i:3" hidden>
+        <svg viewBox="0 0 100 92" aria-hidden="true">
+          <defs><linearGradient id="gAge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--grad-b)"/><stop offset="1" style="stop-color:var(--grad-a)"/></linearGradient></defs>
+          <path d="M50 90 C8 58 2 36 2 24 C2 10 14 2 26 2 C36 2 46 8 50 16 C54 8 64 2 74 2 C86 2 98 10 98 24 C98 36 92 58 50 90 Z" fill="url(#gAge)"/>
+        </svg>
+        <span id="ageNum">00</span>
+        <small>años</small>
+      </div>
+      <p class="hero-date hin" id="fechaTxt" style="--i:4" hidden></p>
+      <p class="hero-count hin" id="heroCount" style="--i:4" hidden></p>
+      <p class="scroll-hint hin" style="--i:5">desliza ↓</p>
+    </header>
+
+    <!-- ============ EL PASTEL ============ -->
+    <section class="section cake-section" id="pastel">
+      <h2 class="title">Pide un deseo</h2>
+      <p class="lead">Cierra los ojos, toca cada velita para apagarla y pide algo muy bonito.</p>
+
+      <div class="cake-stage">
+        <div class="cluster left" aria-hidden="true">
+          <svg style="--a:-26deg;--c:var(--b1)" viewBox="0 0 100 180"><use href="#hballoon"/></svg>
+          <svg style="--a:-6deg;--c:var(--b4)" viewBox="0 0 100 180"><use href="#balloon"/></svg>
+          <svg style="--a:14deg;--c:var(--b2)" viewBox="0 0 100 180"><use href="#balloon"/></svg>
+        </div>
+        <div class="cluster right" aria-hidden="true">
+          <svg style="--a:-14deg;--c:var(--b5)" viewBox="0 0 100 180"><use href="#balloon"/></svg>
+          <svg style="--a:6deg;--c:var(--b6)" viewBox="0 0 100 180"><use href="#hballoon"/></svg>
+          <svg style="--a:26deg;--c:var(--b7)" viewBox="0 0 100 180"><use href="#balloon"/></svg>
+        </div>
+
+        <span class="spark s1" aria-hidden="true">✦</span>
+        <span class="spark s2" aria-hidden="true">♥</span>
+        <span class="spark s3" aria-hidden="true">✦</span>
+        <span class="spark s4" aria-hidden="true">♥</span>
+
+        <div class="cake-wrap">
+          <svg class="cake" viewBox="0 0 360 330" role="img" aria-label="Pastel de tres pisos con cinco velitas">
+            <defs>
+              <linearGradient id="gFlame" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#fff3c4"/><stop offset="1" stop-color="#ffb347"/>
+              </linearGradient>
+              <linearGradient id="gBottom" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" style="stop-color:var(--k-b1)"/><stop offset="1" style="stop-color:var(--k-b2)"/>
+              </linearGradient>
+              <linearGradient id="gMid" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" style="stop-color:var(--k-m1)"/><stop offset="1" style="stop-color:var(--k-m2)"/>
+              </linearGradient>
+              <linearGradient id="gTop" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" style="stop-color:var(--k-t1)"/><stop offset="1" style="stop-color:var(--k-t2)"/>
+              </linearGradient>
+              <path id="mini" d="M0 3 C0 -2 -6 -4 -8 0 C-10 5 -4 9 0 14 C4 9 10 5 8 0 C6 -4 0 -2 0 3 Z"/>
+              <g id="berry">
+                <path d="M0 -9 C10 -9 12 1 0 13 C-12 1 -10 -9 0 -9 Z" fill="#ff3d6e"/>
+                <path d="M-7 -9 L0 -15 L7 -9 L0 -6 Z" fill="#5bbf7a"/>
+                <circle cx="-4" cy="-2" r="1" fill="#ffe7ae"/><circle cx="3" cy="0" r="1" fill="#ffe7ae"/><circle cx="-1" cy="5" r="1" fill="#ffe7ae"/>
+              </g>
+            </defs>
+
+            <!-- base del pastel -->
+            <ellipse cx="180" cy="322" rx="64" ry="7" style="fill:var(--k-plate)"/>
+            <rect x="172" y="296" width="16" height="26" style="fill:var(--k-stand)"/>
+            <ellipse cx="180" cy="294" rx="164" ry="17" style="fill:var(--k-plate)"/>
+            <ellipse cx="180" cy="290" rx="164" ry="17" fill="#fff"/>
+
+            <!-- piso de abajo -->
+            <rect x="40" y="205" width="280" height="84" rx="16" fill="url(#gBottom)"/>
+            <path d="M40 203 H320 V224 q-10 18 -20 0 t-20 0 t-20 0 t-20 0 t-20 0 t-20 0 t-20 0 t-20 0 t-20 0 t-20 0 t-20 0 t-20 0 t-20 0 Z" fill="#fff"/>
+            <text class="cake-text" x="180" y="268" text-anchor="middle">Feliz cumple</text>
+            <use href="#mini" transform="translate(92 256)" fill="#fff"/>
+            <use href="#mini" transform="translate(268 256)" fill="#fff"/>
+            <circle cx="70" cy="244" r="3" fill="#ffe7ae"/><circle cx="290" cy="244" r="3" fill="#ffe7ae"/>
+            <circle cx="112" cy="278" r="3" fill="#ffe7ae"/><circle cx="248" cy="278" r="3" fill="#ffe7ae"/>
+
+            <!-- piso del medio -->
+            <rect x="70" y="140" width="220" height="66" rx="14" fill="url(#gMid)"/>
+            <path d="M70 138 H290 V158 q-10 16 -20 0 t-20 0 t-20 0 t-20 0 t-20 0 t-20 0 t-20 0 t-20 0 t-20 0 t-20 0 Z" fill="#fff"/>
+            <use href="#mini" transform="translate(120 178)" style="fill:var(--k-heart)"/>
+            <use href="#mini" transform="translate(180 184)" style="fill:var(--k-heart)"/>
+            <use href="#mini" transform="translate(240 178)" style="fill:var(--k-heart)"/>
+
+            <!-- piso de arriba -->
+            <rect x="105" y="88" width="150" height="54" rx="12" fill="url(#gTop)"/>
+            <path d="M105 86 H255 V104 q-7.5 14 -15 0 t-15 0 t-15 0 t-15 0 t-15 0 t-15 0 t-15 0 t-15 0 t-15 0 t-15 0 Z" fill="#fff"/>
+            <use href="#mini" transform="translate(145 120)" fill="#fff" opacity=".9"/>
+            <use href="#mini" transform="translate(180 124)" fill="#fff" opacity=".9"/>
+            <use href="#mini" transform="translate(215 120)" fill="#fff" opacity=".9"/>
+            <use href="#berry" transform="translate(120 84)"/>
+            <use href="#berry" transform="translate(240 84)"/>
+
+            <!-- velitas -->
+            <g class="candle" role="button" tabindex="0" aria-label="Apagar velita 1">
+              <rect x="125" y="26" width="22" height="66" fill="transparent"/>
+              <rect x="133" y="56" width="6" height="34" rx="2" fill="#ffffff"/>
+              <ellipse class="flame" cx="136" cy="46" rx="5.5" ry="11" fill="url(#gFlame)"/>
+            </g>
+            <g class="candle" role="button" tabindex="0" aria-label="Apagar velita 2">
+              <rect x="147" y="26" width="22" height="66" fill="transparent"/>
+              <rect x="155" y="56" width="6" height="34" rx="2" style="fill:var(--accent-soft)"/>
+              <ellipse class="flame" cx="158" cy="46" rx="5.5" ry="11" fill="url(#gFlame)"/>
+            </g>
+            <g class="candle" role="button" tabindex="0" aria-label="Apagar velita 3">
+              <rect x="169" y="26" width="22" height="66" fill="transparent"/>
+              <rect x="177" y="56" width="6" height="34" rx="2" style="fill:var(--gold)"/>
+              <ellipse class="flame" cx="180" cy="46" rx="5.5" ry="11" fill="url(#gFlame)"/>
+            </g>
+            <g class="candle" role="button" tabindex="0" aria-label="Apagar velita 4">
+              <rect x="191" y="26" width="22" height="66" fill="transparent"/>
+              <rect x="199" y="56" width="6" height="34" rx="2" style="fill:var(--accent2)"/>
+              <ellipse class="flame" cx="202" cy="46" rx="5.5" ry="11" fill="url(#gFlame)"/>
+            </g>
+            <g class="candle" role="button" tabindex="0" aria-label="Apagar velita 5">
+              <rect x="213" y="26" width="22" height="66" fill="transparent"/>
+              <rect x="221" y="56" width="6" height="34" rx="2" fill="#ffffff"/>
+              <ellipse class="flame" cx="224" cy="46" rx="5.5" ry="11" fill="url(#gFlame)"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="cake-actions">
+        <button class="btn" id="blowBtn" type="button">Soplar todas</button>
+        <button class="btn btn-ghost" id="relightBtn" type="button">Encender de nuevo</button>
+      </div>
+
+      <p class="wish" id="wish">Que ese deseo se cumpla. Y si necesita ayuda, aquí estoy.</p>
+    </section>
+
+    <!-- ============ LA CARTA ============ -->
+    <section class="section" id="carta">
+      <h2 class="title">Una carta para ti</h2>
+
+      <button class="envelope" id="envelope" type="button" aria-expanded="false" aria-controls="letter">
+        <span class="seal">♥</span>
+        <span class="envelope-text">toca para abrir</span>
+      </button>
+
+      <div class="letter-wrap" id="letter">
+        <div class="letter-inner">
+          <article class="paper">
+            <p class="paper-hi">Hola, mi amor:</p>
+            <p>Hoy es 5 de octubre y quise escribirte yo mismo, con mis propias palabras. Ojalá te lleguen como si te las estuviera diciendo al oído.</p>
+            <p>No sé en qué momento exacto pasó, pero desde aquel 2 de febrero mi vida cambió para bien. Antes pensaba que las cosas bonitas eran grandes y ruidosas; contigo aprendí que a veces son un mensaje a mitad del día, tu risa, o simplemente saber que estás ahí.</p>
+            <p>Gracias por quedarte, por tenerme paciencia, por escucharme y por hacerme sentir que soy suficiente tal como soy. Contigo me dan ganas de ser mejor, no para impresionarte, sino para cuidarte como te mereces.</p>
+            <p>Hoy cumples un año más y lo único que quiero es que seas feliz de verdad: que te rías mucho, que descanses cuando estés cansada, que tus sueños se vayan cumpliendo y que nunca dudes de lo valiosa que eres. Y si algún día el mundo se te hace pesado, acuérdate de que aquí tienes a alguien que te quiere y no se va a ir.</p>
+            <p>A veces las palabras en persona no me alcanzan, por eso hice esta página: para que cuando quieras, puedas volver a leerme.</p>
+            <p class="paper-bye">Te amo, mi niña. Feliz cumpleaños.<br>Siempre tuyo,</p>
+            <p class="signature">Rafael</p>
+          </article>
+          <p class="type-hint" id="typeHint" hidden>toca la carta para verla completa</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RAZONES ============ -->
+    <section class="section" id="razones">
+      <h2 class="title">Razones por las que te celebro</h2>
+      <p class="lead">Voltea cada tarjeta.</p>
+
+      <div class="flip-grid">
+        <div class="flip" role="button" tabindex="0" aria-label="Voltear tarjeta: tu risa">
+          <div class="flip-in">
+            <div class="face front"><span class="ico">♥</span><b>tu risa</b></div>
+            <div class="face back"><p>Porque tu risa le cambia el clima a cualquier día.</p></div>
+          </div>
+        </div>
+        <div class="flip" role="button" tabindex="0" aria-label="Voltear tarjeta: tu ternura">
+          <div class="flip-in">
+            <div class="face front"><span class="ico">✿</span><b>tu ternura</b></div>
+            <div class="face back"><p>Porque sientes y cuidas con una delicadeza que no se encuentra fácil.</p></div>
+          </div>
+        </div>
+        <div class="flip" role="button" tabindex="0" aria-label="Voltear tarjeta: tu mirada">
+          <div class="flip-in">
+            <div class="face front"><span class="ico">✦</span><b>tu mirada</b></div>
+            <div class="face back"><p>Porque hay algo en cómo miras que me hace quedarme mirándote.</p></div>
+          </div>
+        </div>
+        <div class="flip" role="button" tabindex="0" aria-label="Voltear tarjeta: tu forma de ser">
+          <div class="flip-in">
+            <div class="face front"><span class="ico">❋</span><b>tu forma de ser</b></div>
+            <div class="face back"><p>Porque eres auténtica, sin disfraces ni medias tintas.</p></div>
+          </div>
+        </div>
+        <div class="flip" role="button" tabindex="0" aria-label="Voltear tarjeta: tus detalles">
+          <div class="flip-in">
+            <div class="face front"><span class="ico">✧</span><b>tus detalles</b></div>
+            <div class="face back"><p>Porque hasta lo más pequeño lo vuelves importante.</p></div>
+          </div>
+        </div>
+        <div class="flip" role="button" tabindex="0" aria-label="Voltear tarjeta: tú">
+          <div class="flip-in">
+            <div class="face front"><span class="ico">∞</span><b>tú</b></div>
+            <div class="face back"><p>Porque no necesito más motivos: eres tú y ya.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FAVORITAS ============ -->
+    <section class="section" id="favoritas">
+      <h2 class="title">Mis favoritas</h2>
+      <p class="lead">Toca una foto para verla en grande.</p>
+
+      <div class="polaroids">
+        <figure class="polaroid" style="--r:-4deg" role="button" tabindex="0" data-lb data-cap="la que más me gusta de ti">
+          <svg class="tie" style="--c:var(--b1)" viewBox="0 0 100 180" aria-hidden="true"><use href="#hballoon"/></svg>
+          <img src="foto1.jpg" alt="Foto favorita" loading="lazy" decoding="async">
+          <figcaption>la que más me gusta de ti</figcaption>
+        </figure>
+        <figure class="polaroid" style="--r:3deg" role="button" tabindex="0" data-lb data-cap="el beso que quiero recordar siempre">
+          <svg class="tie" style="--c:var(--b4)" viewBox="0 0 100 180" aria-hidden="true"><use href="#hballoon"/></svg>
+          <img src="foto3.jpg" alt="Nuestro beso" loading="lazy" decoding="async">
+          <figcaption>el beso que quiero recordar siempre</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ============ ROMPECABEZAS ============ -->
+    <section class="section" id="rompecabezas">
+      <h2 class="title">Arma nuestro recuerdo</h2>
+      <p class="lead">Toca dos piezas para intercambiarlas hasta armar la foto.</p>
+      <div class="pz-wrap">
+        <div class="pz-board" id="pzBoard"><div class="pz-ghost" id="pzGhost"></div></div>
+        <p class="pz-meta">Movimientos: <b id="pzMoves">0</b></p>
+        <div class="cake-actions">
+          <button class="btn btn-ghost" id="pzHint" type="button">Ver pista</button>
+          <button class="btn" id="pzShuffle" type="button">Mezclar de nuevo</button>
+        </div>
+        <p class="pz-msg" id="pzMsg">¡Lo lograste! Así de bien encajamos tú y yo ♥</p>
+      </div>
+    </section>
+
+    <!-- ============ DESEOS ============ -->
+    <section class="section" id="deseos">
+      <h2 class="title">Lo que te deseo este año</h2>
+      <ul class="wish-list">
+        <li><span>Calma</span> para los días pesados.</li>
+        <li><span>Risas</span> de esas que duelen la panza.</li>
+        <li><span>Sueños</span> que se vayan cumpliendo uno a uno.</li>
+        <li><span>Abrazos</span> de la gente que más te quiere.</li>
+        <li><span>Y a mí</span> cerquita, para celebrarlo todo contigo.</li>
+      </ul>
+    </section>
+
+    <!-- ============ FINAL ============ -->
+    <section class="section final" id="final">
+      <svg class="final-heart" viewBox="0 0 100 92" aria-hidden="true"><path d="M50 90 C8 58 2 36 2 24 C2 10 14 2 26 2 C36 2 46 8 50 16 C54 8 64 2 74 2 C86 2 98 10 98 24 C98 36 92 58 50 90 Z"/></svg>
+      <p class="final-script">Mi deseo para ti</p>
+      <p class="final-text">Que cada año te traiga más de lo que mereces,<br>y que yo esté ahí para verlo.</p>
+      <p class="final-big">Feliz cumpleaños, mi niña</p>
+      <button class="btn" id="againBtn" type="button">Celebrar otra vez 🎉</button>
+      <p class="foot">hecho con cariño — 2026</p>
+    </section>
+
+  </main>
+
+  <!-- ============ VISOR DE FOTOS ============ -->
+  <div class="lb" id="lb" aria-hidden="true">
+    <button class="lb-close" id="lbClose" type="button" aria-label="Cerrar foto">×</button>
+    <img src="" alt="">
+    <p></p>
+  </div>
+
+<script>
+  /* ===================== CONFIGURACIÓN (edita aquí) ===================== */
+  const CONFIG = {
+    nombre:        "Amy",        // título grande de la portada
+    dedicatoria:   "mi amor",    // lo que aparece tras "Feliz cumpleaños" en los fuegos artificiales
+    edad:          null,         // por ejemplo 20 (null = no se muestra)
+    fecha:         "5 de octubre, 2026", // se muestra bajo el título (vacío = no se muestra)
+    tema:          "atardecer",  // atardecer | rosadorado | lavanda | medianoche | rosapastel
+    selectorTemas: false,         // true = botón 🎨 para probar paletas. Ponlo en false antes de enviarla
+    globoSorpresa: null,         // 0 a 6 para fijar cuál globo abre la sorpresa; null = al azar
+    fotoRompecabezas: "foto3.jpg", // foto del rompecabezas (foto1.jpg o foto3.jpg)
+    desbloqueo:    "2026-10-05T00:00:00-05:00", // hora exacta del cumpleaños (Perú, UTC-5): la usa la cuenta regresiva
+    cuentaRegresiva: true,       // true = muestra "faltan X horas…" en la portada
+    bloquear:      true          // true = se abre sola a la medianoche (agrega ?probar al enlace para verla ya). false = abierta siempre
+  };
+  /* ====================================================================== */
+
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const BALLOONS = ['var(--b1)', 'var(--b2)', 'var(--b3)', 'var(--b4)', 'var(--b5)', 'var(--b6)', 'var(--b7)'];
+  const HEARTS   = ['var(--accent-soft)', 'var(--b1)', 'var(--accent)', 'var(--b3)', 'var(--accent2)'];
+  let COLORS = ['#ff4f86', '#ff8fab', '#f2b45a', '#b58cff', '#6cc3ff', '#5fd3a6'];
+
+  /* ===================== PALETAS ===================== */
+  const THEMES = ['atardecer', 'rosadorado', 'lavanda', 'medianoche', 'rosapastel'];
+  const THEME_NAMES = { atardecer: 'Atardecer', rosadorado: 'Rosa dorado', lavanda: 'Lavanda', medianoche: 'Medianoche', rosapastel: 'Rosa pastel' };
+  let themeIdx = 0, themeTimer = null;
+  function readPalette() {
+    const cs = getComputedStyle(document.documentElement);
+    const pal = [1, 2, 3, 4, 5, 6, 7].map(i => cs.getPropertyValue('--b' + i).trim()).filter(Boolean);
+    const gold = cs.getPropertyValue('--gold').trim();
+    if (pal.length) COLORS = gold ? [...pal, gold] : pal;
+  }
+  function setTheme(t) {
+    if (!THEMES.includes(t)) t = THEMES[0];
+    themeIdx = THEMES.indexOf(t);
+    document.documentElement.dataset.tema = t;
+    readPalette();
+  }
+  setTheme(CONFIG.tema);
+  if (CONFIG.selectorTemas) {
+    $('#themeBtn').addEventListener('click', () => {
+      setTheme(THEMES[(themeIdx + 1) % THEMES.length]);
+      const n = $('#themeName');
+      n.textContent = THEME_NAMES[THEMES[themeIdx]];
+      n.classList.add('show');
+      clearTimeout(themeTimer);
+      themeTimer = setTimeout(() => n.classList.remove('show'), 1800);
+    });
+  } else {
+    $('#themeBtn').remove(); $('#themeName').remove();
+  }
+
+  /* ---- datos de portada ---- */
+  $('#nombre').textContent = CONFIG.nombre;
+  $('#dedic').textContent = CONFIG.dedicatoria;
+  document.title = `Feliz cumpleaños, ${CONFIG.nombre} ♡`;
+  if (CONFIG.edad)  { $('#ageNum').textContent = CONFIG.edad; $('#ageBox').hidden = false; }
+  if (CONFIG.fecha) { $('#fechaTxt').textContent = CONFIG.fecha; $('#fechaTxt').hidden = false; }
+
+  /* ---- accesibilidad: Enter/Espacio activan los role="button" ---- */
+  $$('[role="button"]').forEach(el => el.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
+  }));
+
+  /* ===================== CONFETI (corazones y papelitos) ===================== */
+  const cv = $('#confetti'), cx = cv.getContext('2d');
+  let W, H, parts = [], raf = null;
+
+  function size() {
+    const r = window.devicePixelRatio || 1;
+    W = innerWidth; H = innerHeight;
+    cv.width = W * r; cv.height = H * r;
+    cx.setTransform(r, 0, 0, r, 0, 0);
+  }
+  addEventListener('resize', size); size();
+
+  function heartPath(c, s) {
+    c.beginPath();
+    c.moveTo(0, s * .25);
+    c.bezierCurveTo(0, 0, -s * .55, 0, -s * .55, s * .3);
+    c.bezierCurveTo(-s * .55, s * .62, 0, s * .8, 0, s);
+    c.bezierCurveTo(0, s * .8, s * .55, s * .62, s * .55, s * .3);
+    c.bezierCurveTo(s * .55, 0, 0, 0, 0, s * .25);
+    c.closePath();
+  }
+  function addPart(x, y, vx, vy, g, max) {
+    parts.push({
+      x, y, vx, vy, g, max, life: 0,
+      w: 8 + Math.random() * 9, h: 4 + Math.random() * 5,
+      r: Math.random() * 6.28, vr: (Math.random() - .5) * .3,
+      k: Math.random() < .55 ? 'h' : 'r',
+      c: COLORS[(Math.random() * COLORS.length) | 0]
+    });
+  }
+  function burst(x, y, n = 90) {
+    if (reduce) return;
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, s = 4 + Math.random() * 9;
+      addPart(x, y, Math.cos(a) * s, Math.sin(a) * s - 6, .25, 110 + Math.random() * 80);
+    }
+    start();
+  }
+  function rain(n = 140) {
+    if (reduce) return;
+    for (let i = 0; i < n; i++) {
+      addPart(Math.random() * W, -20 - Math.random() * H * .4, (Math.random() - .5) * 2, 2 + Math.random() * 3, .03, 260 + Math.random() * 120);
+    }
+    start();
+  }
+  function start() { if (!raf) raf = requestAnimationFrame(tick); }
+  function tick() {
+    cx.clearRect(0, 0, W, H);
+    parts = parts.filter(p => p.life < p.max && p.y < H + 30);
+    for (const p of parts) {
+      p.life++; p.vx *= .985; p.vy = (p.vy + p.g) * .992;
+      p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      cx.save();
+      cx.globalAlpha = Math.min(1, (p.max - p.life) / 40);
+      cx.translate(p.x, p.y); cx.rotate(p.r);
+      cx.fillStyle = p.c;
+      if (p.k === 'h') { cx.translate(0, -p.w * .65); heartPath(cx, p.w * 1.3); cx.fill(); }
+      else cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      cx.restore();
+    }
+    if (parts.length) raf = requestAnimationFrame(tick);
+    else { raf = null; cx.clearRect(0, 0, W, H); }
+  }
+
+  /* ===================== FUEGOS ARTIFICIALES ===================== */
+  const fwc = $('#fw'), fx = fwc.getContext('2d');
+  const FWCOL = ['#ff5c8a', '#ffd166', '#ff9ab8', '#c9a7ff', '#7fd3ff', '#7dffc2', '#ffffff', '#ff9a5c'];
+  let fwW = 0, fwH = 0, rockets = [], sparks = [], fwRaf = null, fwTimer = null, fwOn = false;
+
+  function fwSize() {
+    const r = window.devicePixelRatio || 1;
+    fwW = innerWidth; fwH = innerHeight;
+    fwc.width = fwW * r; fwc.height = fwH * r;
+    fx.setTransform(r, 0, 0, r, 0, 0);
+  }
+  addEventListener('resize', fwSize); fwSize();
+
+  const pick = () => FWCOL[(Math.random() * FWCOL.length) | 0];
+  const spark = (x, y, vx, vy, c, max, g) => ({ x, y, vx, vy, c, max, g, life: 0, s: 1.5 + Math.random() * 1.3 });
+
+  function launch() {
+    const g = .12, frac = .45 + Math.random() * .35;
+    const v0 = Math.sqrt(2 * g * fwH * frac);
+    rockets.push({ x: fwW * (.1 + Math.random() * .8), y: fwH + 8, vx: (Math.random() - .5) * 1.4, vy: -v0, g });
+    if (!fwRaf) fwRaf = requestAnimationFrame(fwTick);
+  }
+  function explode(x, y) {
+    const t = Math.random(), c1 = pick(), c2 = pick();
+    if (t < .34) { /* corazón */
+      const n = 90, s = .26 + Math.random() * .05;
+      for (let i = 0; i < n; i++) {
+        const a = i / n * Math.PI * 2;
+        const hx = 16 * Math.pow(Math.sin(a), 3);
+        const hy = -(13 * Math.cos(a) - 5 * Math.cos(2 * a) - 2 * Math.cos(3 * a) - Math.cos(4 * a));
+        sparks.push(spark(x, y, hx * s, hy * s, c1, 75 + Math.random() * 20, .02));
+      }
+    } else if (t < .67) { /* anillo de dos colores */
+      const n = 70, s = 3.4 + Math.random() * 1.2;
+      for (let i = 0; i < n; i++) {
+        const a = i / n * Math.PI * 2;
+        sparks.push(spark(x, y, Math.cos(a) * s, Math.sin(a) * s, i % 2 ? c1 : c2, 70 + Math.random() * 20, .03));
+      }
+    } else { /* estallido */
+      for (let i = 0; i < 100; i++) {
+        const a = Math.random() * Math.PI * 2, s = .6 + Math.random() * 5.2;
+        sparks.push(spark(x, y, Math.cos(a) * s, Math.sin(a) * s, Math.random() < .5 ? c1 : c2, 60 + Math.random() * 35, .035));
+      }
+    }
+  }
+  function fwTick() {
+    fx.globalCompositeOperation = 'destination-out';
+    fx.fillStyle = 'rgba(0,0,0,.22)';
+    fx.fillRect(0, 0, fwW, fwH);
+    fx.globalCompositeOperation = 'lighter';
+
+    rockets = rockets.filter(r => {
+      r.vy += r.g; r.x += r.vx; r.y += r.vy;
+      fx.globalAlpha = 1; fx.fillStyle = '#fff3d6';
+      fx.beginPath(); fx.arc(r.x, r.y, 2.2, 0, 6.283); fx.fill();
+      if (r.vy > -1.4) { explode(r.x, r.y); return false; }
+      return true;
+    });
+    sparks = sparks.filter(p => {
+      p.life++; p.vx *= .982; p.vy = p.vy * .982 + p.g; p.x += p.vx; p.y += p.vy;
+      const a = 1 - p.life / p.max;
+      if (a <= 0) return false;
+      fx.globalAlpha = a; fx.fillStyle = p.c;
+      fx.beginPath(); fx.arc(p.x, p.y, p.s, 0, 6.283); fx.fill();
+      return true;
+    });
+    fx.globalAlpha = 1;
+    if (rockets.length || sparks.length || fwOn) fwRaf = requestAnimationFrame(fwTick);
+    else { fwRaf = null; fx.clearRect(0, 0, fwW, fwH); }
+  }
+  function fwStart() {
+    fwOn = true;
+    if (reduce) return;
+    for (let i = 0; i < 7; i++) setTimeout(launch, i * 240);
+    fwTimer = setInterval(() => { launch(); if (Math.random() < .6) setTimeout(launch, 130); }, 480);
+  }
+  function fwStop() { fwOn = false; clearInterval(fwTimer); }
+
+  /* ===================== GLOBOS QUE SUBEN POR LA PANTALLA ===================== */
+  function releaseBalloons(n = 10) {
+    if (reduce) return;
+    for (let i = 0; i < n; i++) {
+      const el = document.createElement('span');
+      el.className = 'fly';
+      el.style.left = (Math.random() * 90) + '%';
+      el.style.setProperty('--s', (56 + Math.random() * 50) + 'px');
+      el.style.setProperty('--d', (6 + Math.random() * 4) + 's');
+      el.style.setProperty('--dl', (Math.random() * 1.4) + 's');
+      el.style.setProperty('--c', BALLOONS[i % BALLOONS.length]);
+      el.innerHTML = `<svg viewBox="0 0 100 180"><use href="#${i % 3 === 0 ? 'hballoon' : 'balloon'}"/></svg>`;
+      el.addEventListener('animationend', () => el.remove());
+      document.body.appendChild(el);
+    }
+  }
+
+  /* ===================== CORAZONES DE FONDO ===================== */
+  (function floaters() {
+    const box = $('#floaters');
+    for (let i = 0; i < 18; i++) {
+      const h = document.createElement('span');
+      h.className = 'fh'; h.textContent = '♥';
+      h.style.setProperty('--x', (Math.random() * 96) + '%');
+      h.style.setProperty('--s', (12 + Math.random() * 28) + 'px');
+      h.style.setProperty('--d', (14 + Math.random() * 14) + 's');
+      h.style.setProperty('--delay', (-Math.random() * 26) + 's');
+      h.style.setProperty('--c', HEARTS[i % HEARTS.length]);
+      box.appendChild(h);
+    }
+  })();
+
+  /* ---- corazoncitos donde ella toque ---- */
+  addEventListener('click', e => {
+    if (reduce) return;
+    for (let i = 0; i < 6; i++) {
+      const h = document.createElement('span');
+      h.className = 'tap'; h.textContent = '♥';
+      h.style.left = e.clientX + 'px'; h.style.top = e.clientY + 'px';
+      h.style.color = HEARTS[i % HEARTS.length];
+      h.style.fontSize = (14 + Math.random() * 16) + 'px';
+      h.style.setProperty('--dx', (Math.random() * 120 - 60) + 'px');
+      h.style.setProperty('--dy', -(60 + Math.random() * 90) + 'px');
+      h.addEventListener('animationend', () => h.remove());
+      document.body.appendChild(h);
+    }
+  });
+
+  /* ===================== MÚSICA ===================== */
+  const audio = $('#audio'), musicBtn = $('#musicBtn');
+  audio.volume = .7;
+  audio.addEventListener('play',  () => musicBtn.classList.remove('off'));
+  audio.addEventListener('pause', () => musicBtn.classList.add('off'));
+
+  /* Los navegadores bloquean el sonido hasta que la persona toca la pantalla.
+     Se intenta sonar apenas abre y, si no se puede, suena con el primer toque (cualquiera). */
+  let userPaused = false;
+  const UNLOCK_EVS = ['touchend', 'pointerup', 'click', 'keydown'];
+  function detachUnlock() { UNLOCK_EVS.forEach(ev => removeEventListener(ev, unlockAudio, true)); }
+  function unlockAudio(e) {
+    if (userPaused) return;
+    if (e && e.target && e.target.closest && e.target.closest('#musicBtn')) return;
+    audio.play().then(detachUnlock).catch(() => {});
+  }
+  UNLOCK_EVS.forEach(ev => addEventListener(ev, unlockAudio, true));
+  audio.play().then(detachUnlock).catch(() => {});
+
+  musicBtn.addEventListener('click', () => {
+    if (audio.paused) { userPaused = false; audio.play().catch(() => {}); }
+    else { userPaused = true; audio.pause(); }
+  });
+
+  /* ===================== INTRO: SOLO UN GLOBO ABRE LA SORPRESA ===================== */
+  const intro = $('#intro'), toast = $('#toast');
+  const bs = $$('.b');
+  const keyIdx = Number.isInteger(CONFIG.globoSorpresa) ? CONFIG.globoSorpresa % bs.length : Math.floor(Math.random() * bs.length);
+  const MISS = ['Ese está vacío… ¡prueba con otro!', 'Casi 😏 sigue buscando', 'Mmm, ese tampoco 🎈', 'Aquí no hay nada, ¡otro globo!', 'Uy, ese no 💗'];
+  let started = false, finished = false, missN = 0, toastTimer = null, autoTimer = null;
+
+  function sayToast(t) {
+    toast.textContent = t; toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+  }
+  function missBalloon(b) {
+    const r = b.getBoundingClientRect();
+    b.classList.add('popped'); b.disabled = true;
+    burst(r.left + r.width / 2, r.top + r.height * .3, 22);
+    sayToast(MISS[missN++ % MISS.length]);
+  }
+  function startShow(b) {
+    started = true;
+    const r = b.getBoundingClientRect();
+    clearTimeout(toastTimer); toast.classList.remove('show');
+    intro.classList.add('pop', 'night');
+    burst(r.left + r.width / 2, r.top + r.height * .3, 130);
+    audio.play().catch(() => { musicBtn.classList.add('off'); });
+    fwStart();
+    setTimeout(() => $('#goBtn').classList.add('show'), 5200);
+    autoTimer = setTimeout(finishIntro, 20000);
+  }
+  function finishIntro() {
+    if (finished) return; finished = true;
+    clearTimeout(autoTimer); fwStop();
+    intro.classList.add('done');
+    document.body.classList.remove('locked');
+    document.body.classList.add('started');
+    rain(110);
+    releaseBalloons(9);
+  }
+  bs.forEach((b, i) => b.addEventListener('click', () => {
+    if (started) return;
+    i === keyIdx ? startShow(b) : missBalloon(b);
+  }));
+  $('#goBtn').addEventListener('click', finishIntro);
+
+  /* ===================== CUENTA REGRESIVA HASTA LA MEDIANOCHE ===================== */
+  (function lockScreen() {
+    const lock = $('#lock');
+    const unlockAt = new Date(CONFIG.desbloqueo).getTime();
+    const bypass = /[?&#]probar/.test(location.search + location.hash);
+    if (!CONFIG.bloquear || bypass || isNaN(unlockAt) || Date.now() >= unlockAt) return;
+
+    $('#lockDate').textContent = CONFIG.fecha || '¡Pronto!';
+    lock.hidden = false;
+    const pad = n => String(n).padStart(2, '0');
+    let timer = null;
+    function update() {
+      let ms = unlockAt - Date.now();
+      if (ms <= 0) {
+        clearInterval(timer);
+        lock.classList.add('gone');
+        burst(innerWidth / 2, innerHeight / 2, 160);
+        setTimeout(() => { lock.hidden = true; }, 1200);
+        return;
+      }
+      const s = Math.floor(ms / 1000), d = Math.floor(s / 86400);
+      $('#lkD').hidden = d === 0;
+      $('#lkD b').textContent = d;
+      $('#lkH').textContent = pad(Math.floor(s % 86400 / 3600));
+      $('#lkM').textContent = pad(Math.floor(s % 3600 / 60));
+      $('#lkS').textContent = pad(s % 60);
+    }
+    update(); timer = setInterval(update, 250);
+  })();
+
+  /* ===================== "FALTAN X HORAS" PARA EL CUMPLEAÑOS ===================== */
+  (function heroCountdown() {
+    const el = $('#heroCount'), target = new Date(CONFIG.desbloqueo).getTime();
+    if (!CONFIG.cuentaRegresiva || isNaN(target)) { el.remove(); return; }
+    const pad = n => String(n).padStart(2, '0');
+    let before = Date.now() < target, timer = null;
+    function tick() {
+      const ms = target - Date.now();
+      if (ms > 0) {
+        const s = Math.floor(ms / 1000), d = Math.floor(s / 86400);
+        const parts = (d ? `<b>${d}</b> d ` : '') +
+          `<b>${pad(Math.floor(s % 86400 / 3600))}</b> h <b>${pad(Math.floor(s % 3600 / 60))}</b> min <b>${pad(s % 60)}</b> s`;
+        el.innerHTML = `Faltan ${parts} para tu cumpleaños`;
+        el.classList.remove('today'); el.hidden = false;
+      } else if (-ms < 864e5) {                       /* durante el día del cumpleaños */
+        el.textContent = '¡Hoy es tu día! 🎉';
+        el.classList.add('today'); el.hidden = false;
+        if (before) { before = false; burst(innerWidth / 2, innerHeight / 2, 160); rain(110); releaseBalloons(10); }
+      } else { el.hidden = true; clearInterval(timer); }
+    }
+    tick(); timer = setInterval(tick, 1000);
+  })();
+
+  /* ===================== GLOBOS DE LA PORTADA ===================== */
+  (function heroBalloons() {
+    const box = $('#balloons');
+    for (let i = 0; i < 11; i++) {
+      const el = document.createElement('span');
+      el.className = 'balloon';
+      el.style.setProperty('--x', (2 + Math.random() * 88) + '%');
+      el.style.setProperty('--s', (46 + Math.random() * 42) + 'px');
+      el.style.setProperty('--d', (14 + Math.random() * 10) + 's');
+      el.style.setProperty('--delay', (-Math.random() * 22) + 's');
+      el.style.setProperty('--c', BALLOONS[i % BALLOONS.length]);
+      el.innerHTML = `<svg viewBox="0 0 100 180"><use href="#${i % 3 === 0 ? 'hballoon' : 'balloon'}"/></svg>`;
+      box.appendChild(el);
+    }
+  })();
+
+  /* ===================== BANDERINES "FELIZ CUMPLE" ===================== */
+  (function bunting() {
+    const box = $('#bunting'), L = 'FELIZCUMPLE'.split('');
+    const FLAGS = ['var(--b1)', 'var(--b2)', 'var(--b4)', 'var(--b5)', 'var(--b3)'];
+    function draw() {
+      const w = box.clientWidth; if (!w) return;
+      const y0 = 6, sag = Math.min(54, w * .12), fs = Math.min(44, w / 12.5);
+      let s = `<svg viewBox="0 0 ${w} 130" width="${w}" height="130" xmlns="http://www.w3.org/2000/svg">` +
+              `<path d="M0 ${y0} Q${w / 2} ${y0 + 2 * sag} ${w} ${y0}" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2"/>`;
+      L.forEach((ch, k) => {
+        const t = .07 + .86 * k / 10;
+        const x = w * t, y = y0 + 4 * sag * t * (1 - t);
+        const a = Math.atan2(4 * sag * (1 - 2 * t), w) * 180 / Math.PI;
+        s += `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${a.toFixed(1)})">` +
+             `<g class="sway" style="--dl:${(-k * .37).toFixed(2)}s">` +
+             `<polygon points="${-fs / 2},0 ${fs / 2},0 0,${fs * 1.15}" style="fill:${FLAGS[k % 5]}"/>` +
+             `<text x="0" y="${fs * .5}" text-anchor="middle" font-size="${fs * .5}" font-weight="700" fill="#3a1a2a" font-family="Fraunces, Georgia, serif">${ch}</text>` +
+             `</g></g>`;
+      });
+      box.innerHTML = s + '</svg>';
+    }
+    draw(); addEventListener('resize', draw);
+  })();
+
+  /* ===================== CANCIÓN DE CUMPLEAÑOS ===================== */
+  let actx = null, singing = false;
+  function playSong() {
+    if (singing) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    actx = actx || new AC();
+    if (actx.state === 'suspended') actx.resume();
+    singing = true;
+    const prevVol = audio.volume;
+    audio.volume = Math.min(prevVol, .12);
+    const N = { G4: 392, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99 };
+    const tune = [
+      ['G4', .75], ['G4', .25], ['A4', 1], ['G4', 1], ['C5', 1], ['B4', 2],
+      ['G4', .75], ['G4', .25], ['A4', 1], ['G4', 1], ['D5', 1], ['C5', 2],
+      ['G4', .75], ['G4', .25], ['G5', 1], ['E5', 1], ['C5', 1], ['B4', 1], ['A4', 2],
+      ['F5', .75], ['F5', .25], ['E5', 1], ['C5', 1], ['D5', 1], ['C5', 2]
+    ];
+    const beat = .36;
+    let t = actx.currentTime + .25;
+    tune.forEach(([n, d]) => {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = 'triangle'; o.frequency.value = N[n];
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(.22, t + .02);
+      g.gain.exponentialRampToValueAtTime(.0001, t + d * beat * .95);
+      o.connect(g).connect(actx.destination);
+      o.start(t); o.stop(t + d * beat);
+      t += d * beat;
+    });
+    setTimeout(() => { audio.volume = prevVol; singing = false; }, (t - actx.currentTime) * 1000 + 300);
+  }
+
+  /* ===================== PASTEL ===================== */
+  const candles = $$('.candle'), wish = $('#wish');
+  function checkAll() {
+    if (candles.every(c => c.classList.contains('out'))) {
+      wish.classList.add('show');
+      playSong();
+      const r = $('.cake').getBoundingClientRect();
+      burst(r.left + r.width / 2, r.top + 40, 120);
+      rain(90);
+      releaseBalloons(8);
+    }
+  }
+  candles.forEach(c => c.addEventListener('click', () => {
+    if (c.classList.contains('out')) return;
+    c.classList.add('out'); checkAll();
+  }));
+  $('#blowBtn').addEventListener('click', () => {
+    candles.filter(c => !c.classList.contains('out')).forEach((c, i) => {
+      setTimeout(() => { c.classList.add('out'); checkAll(); }, i * 170);
+    });
+  });
+  $('#relightBtn').addEventListener('click', () => {
+    candles.forEach(c => c.classList.remove('out'));
+    wish.classList.remove('show');
+  });
+
+  /* ===================== CARTA ===================== */
+  /* La carta se escribe sola: cada letra aparece una a una (el texto ya ocupa su lugar, así no salta). */
+  const letterChars = [];
+  (function prepLetter() {
+    $$('.paper p').forEach(p => {
+      p.setAttribute('aria-label', p.textContent.replace(/\s+/g, ' ').trim());
+      const walk = node => [...node.childNodes].forEach(n => {
+        if (n.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          for (const ch of n.textContent) {
+            const s = document.createElement('span');
+            s.className = 'ch'; s.setAttribute('aria-hidden', 'true'); s.textContent = ch;
+            frag.appendChild(s); letterChars.push(s);
+          }
+          n.replaceWith(frag);
+        } else if (n.nodeType === 1 && n.tagName !== 'BR') walk(n);
+      });
+      walk(p);
+    });
+  })();
+
+  let typed = false, typing = false, typeTimer = null, caret = null;
+  function revealAll() {
+    clearTimeout(typeTimer);
+    letterChars.forEach(s => s.classList.add('on'));
+    if (caret) caret.classList.remove('caret');
+    typing = false; $('#typeHint').hidden = true;
+  }
+  function typeLetter() {
+    if (typed) return; typed = true;
+    if (reduce) { revealAll(); return; }
+    typing = true; $('#typeHint').hidden = false;
+    let i = 0;
+    const step = () => {
+      if (!typing) return;
+      if (caret) caret.classList.remove('caret');
+      const s = letterChars[i];
+      s.classList.add('on', 'caret'); caret = s;
+      const ch = s.textContent; i++;
+      const b = s.getBoundingClientRect().bottom;   /* acompaña la lectura con el scroll */
+      if (b > innerHeight - 90 && b < innerHeight + 220) scrollBy({ top: b - (innerHeight - 90), behavior: 'auto' });
+      if (i >= letterChars.length) { revealAll(); return; }
+      const delay = /[.!?]/.test(ch) ? 300 : /[,:;]/.test(ch) ? 150 : 14 + Math.random() * 14;
+      typeTimer = setTimeout(step, delay);
+    };
+    step();
+  }
+  $('.paper').addEventListener('click', () => { if (typing) revealAll(); });
+
+  $('#envelope').addEventListener('click', e => {
+    const open = $('#letter').classList.toggle('open');
+    e.currentTarget.classList.toggle('open', open);
+    e.currentTarget.setAttribute('aria-expanded', open);
+    if (open) {
+      setTimeout(() => $('#letter').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }), 250);
+      setTimeout(typeLetter, 900);
+    }
+  });
+
+  /* ===================== TARJETAS ===================== */
+  $$('.flip').forEach(f => f.addEventListener('click', () => f.classList.toggle('on')));
+
+  /* ===================== ROMPECABEZAS ===================== */
+  (function puzzle() {
+    const N = 3, board = $('#pzBoard'), ghost = $('#pzGhost'), msg = $('#pzMsg'), movesEl = $('#pzMoves');
+    const src = CONFIG.fotoRompecabezas;
+    let ratio = 4 / 5, order = [], sel = null, moves = 0, solved = false;
+    const tiles = [];
+    const img = new Image();
+    img.onerror = () => $('#rompecabezas').remove();
+    img.onload = () => { ratio = img.naturalWidth / img.naturalHeight; build(); fit(); shuffle(); };
+    img.src = src;
+
+    function fit() {
+      const maxH = Math.min(innerHeight * .72, 520);
+      const w = Math.min(380, innerWidth * .88, maxH * ratio);
+      board.style.width = w + 'px';
+      board.style.height = (w / ratio) + 'px';
+    }
+    addEventListener('resize', fit);
+
+    function build() {
+      ghost.style.backgroundImage = `url("${src}")`;
+      for (let id = 0; id < N * N; id++) {
+        const t = document.createElement('div');
+        t.className = 'pz-tile'; t.setAttribute('role', 'button'); t.tabIndex = 0;
+        t.setAttribute('aria-label', 'Pieza ' + (id + 1));
+        t.style.backgroundImage = `url("${src}")`;
+        t.style.backgroundSize = `${N * 100}% ${N * 100}%`;
+        t.style.backgroundPosition = `${(id % N) * 100 / (N - 1)}% ${Math.floor(id / N) * 100 / (N - 1)}%`;
+        t.addEventListener('click', () => pick(id));
+        t.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(id); } });
+        board.appendChild(t); tiles.push(t);
+      }
+    }
+    function place() {
+      order.forEach((id, pos) => {
+        tiles[id].style.transform = `translate(${(pos % N) * 100}%, ${Math.floor(pos / N) * 100}%)`;
+      });
+      tiles.forEach((t, id) => t.classList.toggle('sel', sel !== null && order[sel] === id));
+      movesEl.textContent = moves;
+    }
+    function shuffle() {
+      if (!tiles.length) return;
+      do {
+        order = [...Array(N * N).keys()];
+        for (let i = order.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [order[i], order[j]] = [order[j], order[i]];
+        }
+      } while (order.every((id, i) => id === i));
+      sel = null; moves = 0; solved = false;
+      board.classList.remove('done'); msg.classList.remove('show');
+      place();
+    }
+    function pick(id) {
+      if (solved) return;
+      const pos = order.indexOf(id);
+      if (sel === null) { sel = pos; place(); return; }
+      if (sel === pos) { sel = null; place(); return; }
+      [order[sel], order[pos]] = [order[pos], order[sel]];
+      sel = null; moves++; place();
+      if (order.every((t, i) => t === i)) win();
+    }
+    function win() {
+      solved = true;
+      setTimeout(() => {
+        board.classList.add('done'); msg.classList.add('show');
+        const r = board.getBoundingClientRect();
+        burst(r.left + r.width / 2, r.top + r.height / 2, 140);
+        rain(80); releaseBalloons(8);
+      }, 350);
+    }
+    $('#pzHint').addEventListener('click', () => {
+      board.classList.add('peek');
+      setTimeout(() => board.classList.remove('peek'), 1800);
+    });
+    $('#pzShuffle').addEventListener('click', shuffle);
+  })();
+
+  /* ===================== VISOR DE FOTOS ===================== */
+  const lb = $('#lb'), lbImg = $('img', lb), lbCap = $('p', lb);
+  function closeLb() { lb.classList.remove('open'); lb.setAttribute('aria-hidden', 'true'); }
+  $$('[data-lb]').forEach(f => f.addEventListener('click', () => {
+    const im = $('img', f);
+    lbImg.src = im.currentSrc || im.src; lbImg.alt = im.alt;
+    lbCap.textContent = f.dataset.cap || '';
+    lb.classList.add('open'); lb.setAttribute('aria-hidden', 'false');
+  }));
+  lb.addEventListener('click', e => { if (e.target !== lbImg) closeLb(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
+
+  /* ===================== FINAL ===================== */
+  $('#againBtn').addEventListener('click', () => {
+    burst(innerWidth / 2, innerHeight * .6, 160);
+    rain(130);
+    releaseBalloons(12);
+  });
+</script>
+</body>
+</html>
